@@ -1,2 +1,2 @@
 # vadidation
-Link to review: https://khoa0302.github.io/vadidation/
+Link to review: https://khoa0302.github.io/validation/
