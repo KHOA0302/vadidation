@@ -62,7 +62,12 @@ validator.isPassword = (selector, min) => {
     return {
         selector,
         test: function (value) {
-            return value.length >= min? undefined : 'Mật khẩu phải có độ dài tối thiểu là 6 kí tự!!!';
+            if(value) {
+                return value.length >= min? undefined : 'Mật khẩu phải có độ dài tối thiểu là 6 kí tự!!!';
+            }
+            else {
+                return value.trim()? undefined : 'Vui lòng nhâp mật khẩu!!!';
+            }
         }
     }
 }
