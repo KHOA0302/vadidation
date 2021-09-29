@@ -39,35 +39,45 @@ function validator(options) {
 
 //Define rules
 //Law of rules ==> if errors, return massages. Else if non errors, return nothing
-validator.isRequired = (selector) => {
+validator.isRequired = (selector, massage) => {
     return {
         selector,
         test: function (value) {
-            return value.trim() ? undefined : 'Vui lòng nhâp trường này!!!!';
+            return value.trim() ? undefined : massage || 'Vui lòng nhâp trường này!!!!';
         }
     }
 }
 
-validator.isEmail = (selector) => {
+validator.isEmail = (selector, massage) => {
     return {
         selector,
         test: function (value) {
             var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            return regex.test(value) ? undefined : 'Trường này phải là email!!';
+            return regex.test(value) ? undefined : massage || 'Trường này phải là email!!';
         }
     }
 }
 
-validator.isPassword = (selector, min) => {
+validator.isPassword = (selector, min, massage) => {
     return {
         selector,
         test: function (value) {
             if(value) {
-                return value.length >= min? undefined : 'Mật khẩu phải có độ dài tối thiểu là 6 kí tự!!!';
+                return value.length >= min? undefined : massage || 'Mật khẩu phải có độ dài tối thiểu là 6 kí tự!!!';
             }
             else {
-                return value.trim()? undefined : 'Vui lòng nhâp mật khẩu!!!';
+                return value.trim()? undefined : 'Vui lòng nhập mật khẩu!!!';
             }
         }
     }
 }
+
+validator.isConfirmed = (selector, getConfirmValue, massage) => {
+    return {
+        selector,
+        test: function (value) {
+            return value === getConfirmValue() ? undefined : massage || 'Giá trị nhập vào không chính xác!!!';
+        }
+    }
+}
+ 

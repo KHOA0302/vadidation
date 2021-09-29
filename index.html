@@ -55,6 +55,9 @@
             validator.isRequired('#fullname'),
             validator.isEmail('#email'),
             validator.isPassword('#password', 6),
+            validator.isConfirmed('#password_confirmation', function() {
+                return document.querySelector('#form-1 #password').value;
+            }, 'Mật khẩu nhập lại không chính xác!!!')
         ]
     })
 </script>
