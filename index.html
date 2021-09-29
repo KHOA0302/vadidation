@@ -53,12 +53,18 @@
         errorSelector: '.form-message',
         rules: [
             validator.isRequired('#fullname'),
+            validator.isRequired('#email'),
             validator.isEmail('#email'),
             validator.isPassword('#password', 6),
+            validator.isRequired('#password_confirmation'),
             validator.isConfirmed('#password_confirmation', function() {
                 return document.querySelector('#form-1 #password').value;
             }, 'Mật khẩu nhập lại không chính xác!!!')
-        ]
+        ],
+        onSubmit: function (data) {
+          /// Call API.
+          console.log(data);
+        }
     })
 </script>
 </html>

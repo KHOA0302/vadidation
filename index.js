@@ -1,10 +1,22 @@
 // object 
 function validator(options) {
-
+    
+    var selectorRules = {};
+    
     function validate(inputElement, rule) {
-        var errorMessage = rule.test(inputElement.value);
         var errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+        var errorMessage;
 
+        // Take rules from selector
+        var rules = selectorRules[rule.selector];
+       
+        // loop per rule (check rule)
+        // if error, stop checking
+       for(var i = 0; i < rules.length; i++) {
+           errorMessage = rules[i](inputElement.value);
+           if(errorMessage) break;
+       }
+        
         if(errorMessage) {
             errorElement.innerHTML = errorMessage;
             inputElement.parentElement.classList.add('invalid');
@@ -12,12 +24,53 @@ function validator(options) {
             errorElement.innerHTML = '';
             inputElement.parentElement.classList.remove('invalid');
         }
+        return !errorMessage;
     }
 
     // take element which need validate
     var formElement = document.querySelector(options.form);
     if(formElement) {
+        formElement.onsubmit = (e) => {
+            e.preventDefault();
+///////////////////////////////////////////////////////////////////////////
+            var isFormValid = true;
+            // loop per rule and validate
+            options.rules.forEach((rule) => {
+                var inputElement = formElement.querySelector(rule.selector);
+                var isValid = validate(inputElement, rule);
+                if(!isValid) {
+                    isFormValid = false;
+                }
+            });
+         
+////////////////////////////////////////////////////////////////////////////
+            if(isFormValid) {
+                // Submit by using javascript
+                if(typeof options.onSubmit === 'function') {
+                    var enableInputs = formElement.querySelectorAll('[name]:not([disabled])');
+            
+                    var formValues = Array.from(enableInputs).reduce((values, input) => {
+                        values[input.name] = input.value
+                        return values;  
+                    }, {});
+                    options.onSubmit(formValues);
+                }
+                /// Submit by using form element 
+                else {
+                    formElement.submit();
+                }
+            }
+        }
         options.rules.forEach((rule) => {
+            
+            if(Array.isArray(selectorRules[rule.selector])) {
+                selectorRules[rule.selector].push(rule.test);
+            } 
+            else {
+                // Save rules into selectorRules
+                selectorRules[rule.selector] = [rule.test];
+            } 
+
             var inputElement = formElement.querySelector(rule.selector);
          
             if(inputElement) {
@@ -33,7 +86,7 @@ function validator(options) {
                     inputElement.parentElement.classList.remove('invalid');
                 }
             }
-        })
+        });
     }
 }
 
@@ -66,7 +119,7 @@ validator.isPassword = (selector, min, massage) => {
                 return value.length >= min? undefined : massage || 'Mật khẩu phải có độ dài tối thiểu là 6 kí tự!!!';
             }
             else {
-                return value.trim()? undefined : 'Vui lòng nhập mật khẩu!!!';
+                return 'Vui lòng nhập mật khẩu!!!';
             }
         }
     }
