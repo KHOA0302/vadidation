@@ -1,10 +1,20 @@
 // object 
 function validator(options) {
+
+    function getParent(element, selector) {
+        while(element.parentElement) {
+            if(element.parentElement.matches(selector)) {
+                return element.parentElement;
+            } else {
+                element = element.parentElement;
+            }
+        }
+    }
     
     var selectorRules = {};
     
     function validate(inputElement, rule) {
-        var errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+        var errorElement = getParent(inputElement, options.formGroupSelector).querySelector(options.errorSelector);
         var errorMessage;
 
         // Take rules from selector
@@ -13,16 +23,24 @@ function validator(options) {
         // loop per rule (check rule)
         // if error, stop checking
        for(var i = 0; i < rules.length; i++) {
-           errorMessage = rules[i](inputElement.value);
+           switch(inputElement.type) {
+               case 'radio':
+               case 'checkbox':
+                   errorMessage = rules[i](formElement.querySelector(rule.selector + ':checked'));
+                //    console.log(errorMessage);
+                    break;
+                default:
+                    errorMessage = rules[i](inputElement.value);
+           }
            if(errorMessage) break;
        }
         
         if(errorMessage) {
             errorElement.innerHTML = errorMessage;
-            inputElement.parentElement.classList.add('invalid');
+            getParent(inputElement, options.formGroupSelector).classList.add('invalid');
         } else {
             errorElement.innerHTML = '';
-            inputElement.parentElement.classList.remove('invalid');
+            getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
         }
         return !errorMessage;
     }
@@ -81,9 +99,9 @@ function validator(options) {
 
                 // handle typing
                 inputElement.oninput = () => {
-                    var errorElement = inputElement.parentElement.querySelector('.form-message');
+                    var errorElement = getParent(inputElement, options.formGroupSelector).querySelector('.form-message');
                     errorElement.innerHTML = '';
-                    inputElement.parentElement.classList.remove('invalid');
+                    getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
                 }
             }
         });
@@ -96,7 +114,7 @@ validator.isRequired = (selector, massage) => {
     return {
         selector,
         test: function (value) {
-            return value.trim() ? undefined : massage || 'Vui lòng nhâp trường này!!!!';
+            return value ? undefined : massage || 'Vui lòng nhâp trường này!!!!';
         }
     }
 }

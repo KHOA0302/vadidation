@@ -25,9 +25,11 @@
     align-self: center;
     box-shadow: 0 2px 5px 0 rgba(51, 62, 73, 0.1);
   }
+
   .form .heading {
     font-size: 2rem;
   }
+
   .form .desc {
     text-align: center;
     color: #636d77;
@@ -44,6 +46,11 @@
     flex-direction: column;
   }
   
+  .form-element {
+    display: flex;
+    align-items: center;
+  }
+
   .form-label,
   .form-message {
     text-align: left;
@@ -82,7 +89,16 @@
     line-height: 1.6rem;
     padding: 4px 0 0;
   }
+
+  .form-element label[name="gender"] {
+    width: 40px;
+  }
   
+  .form-element input[name="gender"]{
+    margin-left: 20px;
+    width: 16px;
+  }
+
   .form-submit {
     outline: none;
     background-color: #1dbfaf;
