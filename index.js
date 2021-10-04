@@ -65,10 +65,29 @@ function validator(options) {
             if(isFormValid) {
                 // Submit by using javascript
                 if(typeof options.onSubmit === 'function') {
-                    var enableInputs = formElement.querySelectorAll('[name]:not([disabled])');
-            
+                    var enableInputs = formElement.querySelectorAll('[name]:not([disabled])');       
                     var formValues = Array.from(enableInputs).reduce((values, input) => {
-                        values[input.name] = input.value
+                        switch(input.type) {
+                            case 'radio':
+                                values[input.name] = formElement.querySelector('input[name="' + input.name + '"]:checked').value;
+                                break;
+                            case 'checkbox':
+                                if(!input.matches(':checked')) {
+                                    values[input.name] = '';
+                                    return values;
+                                };
+
+                                if (!Array.isArray(values[input.name])) {
+                                    values[input.name] = [];
+                                }
+                                values[input.name].push(input.value); 
+                                break;
+                            case 'file':
+                                values[input.name] = input.files;
+                                break;
+                            default:
+                                values[input.name] = input.value;
+                        }
                         return values;  
                     }, {});
                     options.onSubmit(formValues);
@@ -89,21 +108,25 @@ function validator(options) {
                 selectorRules[rule.selector] = [rule.test];
             } 
 
-            var inputElement = formElement.querySelector(rule.selector);
+            var inputElements = formElement.querySelectorAll(rule.selector);
          
-            if(inputElement) {
-                // handle blur out of input element
-                inputElement.onblur = () => {
-                   validate(inputElement, rule);
+            Array.from(inputElements).forEach((inputElement) => {      
+                if(inputElement) {
+                    // handle blur out of input element
+                    inputElement.onblur = () => {
+                       validate(inputElement, rule);
+                    }
+    
+                    // handle typing
+                    inputElement.oninput = () => {
+                        var errorElement = getParent(inputElement, options.formGroupSelector).querySelector('.form-message');
+                        errorElement.innerHTML = '';
+                        getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
+                    }
                 }
+            })
 
-                // handle typing
-                inputElement.oninput = () => {
-                    var errorElement = getParent(inputElement, options.formGroupSelector).querySelector('.form-message');
-                    errorElement.innerHTML = '';
-                    getParent(inputElement, options.formGroupSelector).classList.remove('invalid');
-                }
-            }
+            
         });
     }
 }

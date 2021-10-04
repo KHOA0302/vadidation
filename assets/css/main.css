@@ -90,7 +90,7 @@
     padding: 4px 0 0;
   }
 
-  .form-element label[name="gender"] {
+  .form-element label[class="form-label"] {
     width: 40px;
   }
   
